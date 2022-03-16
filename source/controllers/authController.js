@@ -1,8 +1,7 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
-
-const JWT_SECRET = '!@#!@#sdfsdgpsdoikf983475jlksndf!@#!@#'
+const { AUTH_PRIVATE_KEY } = require('../config/globals')
 
 module.exports.register_post = async (req, res) => {
   const { username, password: plainTextPassword, passwordConfirm } = req.body
@@ -58,11 +57,10 @@ module.exports.login_post = async (req, res) => {
     const token = jwt.sign({
       id: user._id,
       username: user.username
-    }, JWT_SECRET)
+    }, AUTH_PRIVATE_KEY)
 
-    const sign = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
 
-    return res.json({ status: 'Success', user: sign })
+    return res.json({ status: 'Success', token: token })
   }
 
   res.status(400).json({ code: 400, status: 'error', message: 'Usuário ou Senha incorretos' })
