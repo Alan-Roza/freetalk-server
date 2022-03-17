@@ -14,6 +14,10 @@ module.exports.register_post = async (req, res) => {
     return res.status(400).json({ code: 400, status: 'error', message: 'Senha inválido' })
   }
 
+  if (plainTextPassword && plainTextPassword.length < 8) {
+    return res.status(400).json({ code: 400, status: 'error', message: 'A senha precisar ter ao menos 8 caracteres' })
+  }
+
   if (plainTextPassword !== passwordConfirm) {
     return res.status(400).json({ code: 400, status: 'error', message: 'As senhas devem ser iguais' })
   }
