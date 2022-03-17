@@ -65,3 +65,7 @@ module.exports.login_post = async (req, res) => {
 
   res.status(400).json({ code: 400, status: 'error', message: 'Usuário ou Senha incorretos' })
 }
+
+module.exports.refresh_token = async (req, res) => {
+    return res.json({ status: 'Success' })
+}
