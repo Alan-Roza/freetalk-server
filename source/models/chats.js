@@ -1,14 +1,27 @@
 const mongoose = require('mongoose')
-const msgSchema = new mongoose.Schema({
-  _id: String,
+const chatSchema = new mongoose.Schema({
   messages: [{
-    senderId: String,
-    message: String,
-    createdAt: String
+    senderId: {
+      type: String
+    },
+    message: {
+      type: String
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
   }],
-  integrates: [String],
-  privateChat: Boolean
-})
+  senderName: String,
+  receiverName: String,
+  privateChat: Boolean,
+  references: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserSchema'
+  }]
+},
+  { collection: 'chats' }
+)
 
-const Chat = mongoose.model('Chat', msgSchema)
+const Chat = mongoose.model('Chat', chatSchema)
 module.exports = Chat

@@ -71,5 +71,5 @@ module.exports.login_post = async (req, res) => {
 }
 
 module.exports.refresh_token = async (req, res) => {
-    return res.json({ status: 'Success' })
+    return res.json({ status: 'Success', data: {userId: req.userId, username: req.username} })
 }

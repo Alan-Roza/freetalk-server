@@ -40,19 +40,27 @@ io.on('connection', (socket) => {
     socket.emit('output-messages', result)
   })
 
-  socket.on('chat-message', (msg) => {
-    const message = new Chats({ msg })
-    message.save().then(() => {
-      console.log(msg, 'msg')
-      io.emit('message', msg)
+  socket.on('new-chat', (chat) => {
+    const newChat = new Chats(chat)
+    newChat.save().then(() => {
+      console.log(chat, 'chat')
+      io.emit('chat-created', chat)
     })
   })
+
+  // socket.on('chat-message', (msg) => {
+  //   const message = new Chats({ msg })
+  //   message.save().then(() => {
+  //     console.log(msg, 'msg')
+  //     io.emit('message', msg)
+  //   })
+  // })
 
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
 })
 
-httpServer.listen(PORT, async() => {
+httpServer.listen(PORT, async () => {
   console.log(`listening on *:${PORT}`)
 })
