@@ -43,11 +43,11 @@ io.on('connection', (socket) => {
   console.log('a user connected')
 
   socket.on('join', async (chatId) => {
+    let response
     try {
-      const response = await collection.findOne({ "_id": new mongoose.mongo.ObjectId(chatId) })
-      console.log(new mongoose.mongo.ObjectId(chatId), 'response')
+      response = await collection.findOne({ "_id": new mongoose.mongo.ObjectId(chatId) })
       if (!response) {
-        await collection.insertOne({ "_id": new mongoose.mongo.ObjectId(chatId), messages: [] })
+       response = await collection.insertOne({ "_id": new mongoose.mongo.ObjectId(chatId), messages: [] })
       }
       socket.join(chatId)
       socket.emit("joined", response)
@@ -65,7 +65,6 @@ io.on('connection', (socket) => {
 
         references: newChat.references,
         messages: [],
-        // receiverName: newChat.receiverName,
         privateChat: newChat.privateChat
 
       })
@@ -98,9 +97,14 @@ io.on('connection', (socket) => {
     })
   })
 
-  Chats.find().then(result => {
-    socket.emit('output-messages', result)
+  socket.on('chat-in', (_id) => {
+    Chats.find({references: {userId: _id}}).then(result => {
+      console.log(result, _id, 'emit')
+      socket.emit('output-messages', result)
+    })
   })
+
+  
 
   socket.on('disconnect', () => {
     console.log('user disconnected')

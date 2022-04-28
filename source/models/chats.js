@@ -16,8 +16,8 @@ const chatSchema = new mongoose.Schema({
   receiverName: String,
   privateChat: Boolean,
   references: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserSchema'
+    name: String,
+    userId: mongoose.Schema.Types.ObjectId
   }]
 },
   { collection: 'chats' }
