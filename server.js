@@ -4,9 +4,6 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const { Server } = require('socket.io')
 const Chats = require('./source/models/chats')
-const User = require('./source/models/user')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 const authRoutes = require('./source/routes/authRoutes')
 const { MongoClient } = require('mongodb')
 
@@ -81,7 +78,6 @@ io.on('connection', (socket) => {
 
       })
       socket.join(newId)
-      socket.emit("joined", newId)
       socket.activeRoom = newId
 
       // Encontra e Retorna as informações do chat criado
@@ -106,9 +102,11 @@ io.on('connection', (socket) => {
     const response = await collection.findOne({ "_id": new mongoose.mongo.ObjectId(socket.activeRoom) })
     io.to(socket.activeRoom).emit("message", response)
 
-    Chats.find().then(result => {
-      io.emit('chat-updated', result)
-    })
+    if (chat.currentUser) {
+      Chats.find({ "references.userId": new mongoose.mongo.ObjectId(chat.currentUser) }).then(result => {
+        socket.emit('output-messages', result)
+      })
+    }
   })
 
   // Os chats de um usuário específico
@@ -116,13 +114,10 @@ io.on('connection', (socket) => {
     if (_id) {
       _id = new mongoose.mongo.ObjectId(_id)
       Chats.find({ "references.userId": _id }).then(result => {
-        console.log(result, _id, 'emit chat in')
         socket.emit('output-messages', result)
       })
     }
   })
-
-
 
   socket.on('disconnect', () => {
     console.log('user disconnected')

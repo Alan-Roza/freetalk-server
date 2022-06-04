@@ -2,7 +2,6 @@ const User = require('../models/user')
 
 module.exports.get_user = ((req, res) => {
   const { username } = req.body
-  console.log(username, 'name', req.body)
   try {
     User.find({"username": username}).then(response => {
       if (response && response.length > 0 && Array.isArray(response)) {
