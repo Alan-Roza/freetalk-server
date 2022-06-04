@@ -4,7 +4,7 @@ module.exports.get_user = ((req, res) => {
   const { username } = req.body
   console.log(username, 'name', req.body)
   try {
-    const response = User.find({"username": username}).then(response => {
+    User.find({"username": username}).then(response => {
       if (response && response.length > 0 && Array.isArray(response)) {
         return res.status(200).json({ code: 200, status: 'success', message: 'Usuário encontrado com sucesso', data: response })
       } else if (response.length === 0 && Array.isArray(response)) {

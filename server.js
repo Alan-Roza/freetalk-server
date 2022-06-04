@@ -12,7 +12,7 @@ const { MongoClient } = require('mongodb')
 
 var cors = require('cors');
 
-const mongoDB = 'mongodb://localhost:27017/freetalk-db'
+const mongoDB = 'mongodb://localhost:27017/freetalk-db' // String connect mongodb
 const PORT = 3100
 const app = express()
 
@@ -29,6 +29,7 @@ app.use(express.static('public'));
 
 app.use(authRoutes)
 
+// Conectando ao mongodb'
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
   console.log('connected')
 }).catch((err) => {
@@ -42,6 +43,7 @@ var collection
 io.on('connection', (socket) => {
   console.log('a user connected')
 
+  // Conecta a um chat específico
   socket.on('join', async (chatId) => {
     let response
     try {
@@ -57,6 +59,7 @@ io.on('connection', (socket) => {
     }
   })
 
+  // Cria um novo chat
   socket.on('create', async (newChat) => {
     const newId = new mongoose.mongo.ObjectId()
     try {
@@ -81,6 +84,7 @@ io.on('connection', (socket) => {
       socket.emit("joined", newId)
       socket.activeRoom = newId
 
+      // Encontra e Retorna as informações do chat criado
       const response = await collection.findOne({ "_id": new mongoose.mongo.ObjectId(newId) })
       socket.emit("chat-created", response)
     } catch (err) {
@@ -88,6 +92,7 @@ io.on('connection', (socket) => {
     }
   })
 
+  // Atualiza o chat com novas mensagens
   socket.on("message", async (chat) => {
     collection.updateOne({ "_id": new mongoose.mongo.ObjectId(socket.activeRoom) }, {
       "$push": {
@@ -106,6 +111,7 @@ io.on('connection', (socket) => {
     })
   })
 
+  // Os chats de um usuário específico
   socket.on('chat-in', (_id) => {
     if (_id) {
       _id = new mongoose.mongo.ObjectId(_id)
@@ -123,6 +129,7 @@ io.on('connection', (socket) => {
   })
 })
 
+// Inicia-se o server
 httpServer.listen(PORT, async () => {
   try {
     await client.connect()
